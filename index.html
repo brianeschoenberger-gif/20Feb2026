@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tariff Panic — Milestone 0</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="top-bar">
+        <h1>Tariff Panic</h1>
+        <section id="event-banner" class="event-banner inactive" aria-live="polite">
+          <div class="event-name">No Active Event</div>
+          <div class="event-rule">Normal operations in effect.</div>
+          <div class="event-time">--</div>
+        </section>
+      </header>
+
+      <section class="hud" aria-label="Game status">
+        <div class="hud-item"><span>Time</span><strong id="timer">90</strong></div>
+        <div class="hud-item"><span>Score</span><strong id="score">0</strong></div>
+        <div class="hud-item"><span>Strikes</span><strong id="strikes">0/3</strong></div>
+      </section>
+
+      <section class="board">
+        <aside class="queue-panel">
+          <h2>Incoming Queue</h2>
+          <p class="hint">Drag containers into lanes before urgency expires.</p>
+          <div id="queue" class="queue" aria-label="Container queue"></div>
+        </aside>
+
+        <section class="lanes" aria-label="Routing lanes">
+          <div class="lane" data-lane="Domestic" tabindex="0">
+            <h3>Domestic</h3>
+            <p>Local-cleared flow</p>
+          </div>
+          <div class="lane" data-lane="Import" tabindex="0">
+            <h3>Import</h3>
+            <p>Inbound trade flow</p>
+          </div>
+          <div class="lane" data-lane="Hold" tabindex="0">
+            <h3>Hold</h3>
+            <p>Safe fallback lane</p>
+          </div>
+        </section>
+      </section>
+
+      <section id="feedback-layer" class="feedback-layer" aria-live="polite"></section>
+    </main>
+
+    <section id="end-modal" class="end-modal hidden" role="dialog" aria-modal="true" aria-labelledby="end-title">
+      <div class="end-content">
+        <h2 id="end-title">Shift Complete</h2>
+        <p id="end-message">Final Score: 0</p>
+        <button id="restart-btn" type="button">Restart Run</button>
+      </div>
+    </section>
+
+    <script src="game.js"></script>
+  </body>
+</html>

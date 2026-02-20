@@ -1,9 +1,9 @@
-1) PRODUCT.md
+﻿1) PRODUCT.md
 
-# Tariff Panic — Product Brief
+# Tariff Panic â€” Product Brief
 
 ## Goal / Target Player
-- **Goal:** Deliver a 2–3 minute, high-pressure logistics arcade game where players sort containers correctly under changing tariff rules.
+- **Goal:** Deliver a 2â€“3 minute, high-pressure logistics arcade game where players sort containers correctly under changing tariff rules.
 - **Target player:** Casual browser players (13+) who like fast decision games and score chasing.
 
 ## Core Loop
@@ -31,14 +31,14 @@
 ## Success Criteria
 - First-time player understands objective in <15 seconds.
 - Game is playable instantly by opening `index.html`.
-- At least 1 meaningful “rule flip” moment every 20–30 seconds.
-- Most play sessions end with “just one more run” score-chase feel.
+- At least 1 meaningful â€œrule flipâ€ moment every 20â€“30 seconds.
+- Most play sessions end with â€œjust one more runâ€ score-chase feel.
 
 ---
 
 2) Vertical Slice Plan (Milestone 0 and Milestone 1)
 
-## Milestone 0 — Definition of “Playable”
+## Milestone 0 â€” Definition of â€œPlayableâ€
 - You can complete a full 90-second run with:
   - spawning containers,
   - drag/drop routing into 3 lanes,
@@ -47,7 +47,7 @@
   - end screen and restart.
 - Core loop is fun and readable without tutorial text beyond short labels.
 
-## Milestone 0 — Exact Features (Minimal but Fun)
+## Milestone 0 â€” Exact Features (Minimal but Fun)
 - **Core board:** Queue area + 3 lane drop zones (`Domestic`, `Import`, `Hold`).
 - **Containers:**
   - Types: `Electronics`, `Food`, `Machinery`.
@@ -57,7 +57,7 @@
   - Correct drop = points; wrong drop = strike/point loss.
 - **Tariff events (simple):**
   - One active modifier at a time.
-  - Examples: “Import surcharge: Import lane penalties doubled”, “Emergency exemption: Food to Import now valid”.
+  - Examples: â€œImport surcharge: Import lane penalties doubledâ€, â€œEmergency exemption: Food to Import now validâ€.
   - Event duration + clear countdown.
 - **Pressure systems:**
   - Queue cap (overflow penalty).
@@ -70,7 +70,7 @@
   - Big labels, high contrast, lane highlighting on drag hover.
   - Short feedback text: `+20 Correct`, `-1 Strike`, `Late!`.
 
-## Milestone 1 — Moves Here
+## Milestone 1 - Moves Here
 - Combo multiplier for consecutive correct drops.
 - More event variety + event preview ticker.
 - Difficulty tuning screen (easy/normal/hard).
@@ -78,10 +78,21 @@
 - Better onboarding overlay (15-second quick tutorial).
 - Local best score persistence (`localStorage`).
 
+## Milestone 2 - Moves Here
+- Pause/resume controls (`P` or `Space`, plus on-screen button).
+- Touch-first routing fallback: tap a container, then tap a lane.
+- End-of-run operational stats summary:
+  - correct routes,
+  - hold routes,
+  - wrong routes,
+  - expired containers,
+  - overflow penalties,
+  - event activations.
+- Live status indicator in HUD (`Live` / `Paused` / `Stopped`).
+
 ## Explicitly Deferred
 - Story mode / narrative dialogues.
-- Mobile touch optimization.
-- Accessibility pass beyond basic contrast.
+- Advanced accessibility pass (screen-reader narration and remappable controls).
 - Analytics, leaderboard, cloud save.
 - Procedural balancing tools.
 
@@ -93,14 +104,18 @@
 In a fast-moving trade terminal, you are the shift coordinator during sudden tariff policy shocks. Containers arrive nonstop, and you must route each one to the best lane before deadlines and rule changes cause penalties. The challenge is logistical speed and adaptation, not political commentary.
 
 ## Controls
-- **Mouse-only required:**
+- **Mouse drag-and-drop:**
   - Click/hold container from queue.
   - Drag onto lane drop zone.
   - Release to assign.
+- **Touch/click fallback routing:**
+  - Tap/click a container to select it.
+  - Tap/click a lane to route selection.
 - **Optional keyboard shortcuts:**
   - `1` = send selected/oldest queue container to Domestic.
   - `2` = send to Import.
   - `3` = send to Hold.
+  - `P` or `Space` = pause/resume run.
   - `R` = restart on end screen.
 
 ## Systems
@@ -126,7 +141,7 @@ In a fast-moving trade terminal, you are the shift coordinator during sudden tar
 
 ### Tariff Events (Simple + Readable)
 - One event active at once.
-- Events spawn every 18–24 seconds, last 10–14 seconds.
+- Events spawn every 18â€“24 seconds, last 10â€“14 seconds.
 - M0 event list:
   1. **Import Surcharge:** any container dropped in Import gives -10 extra.
   2. **Food Exemption:** Food in Import counts as correct (+15).
@@ -149,12 +164,12 @@ In a fast-moving trade terminal, you are the shift coordinator during sudden tar
   - or timer reaches 0 => run complete screen.
 
 ## Difficulty Ramp (First 90 Seconds)
-- **0–15s:** Spawn every 2.4s, no event active, 2 container types only (Food/Electronics).
-- **15–30s:** Spawn every 2.0s, introduce Machinery, first event at ~20s.
-- **30–45s:** Spawn every 1.8s, urgency reduced by 10% globally.
-- **45–60s:** Spawn every 1.6s, second event, queue max effectively tighter due to pace.
-- **60–75s:** Spawn every 1.4s, event duration slightly longer, more mixed types.
-- **75–90s:** Spawn every 1.25s, final event window + high pressure until end.
+- **0â€“15s:** Spawn every 2.4s, no event active, 2 container types only (Food/Electronics).
+- **15â€“30s:** Spawn every 2.0s, introduce Machinery, first event at ~20s.
+- **30â€“45s:** Spawn every 1.8s, urgency reduced by 10% globally.
+- **45â€“60s:** Spawn every 1.6s, second event, queue max effectively tighter due to pace.
+- **60â€“75s:** Spawn every 1.4s, event duration slightly longer, more mixed types.
+- **75â€“90s:** Spawn every 1.25s, final event window + high pressure until end.
 
 ## UX Readability Rules
 - Font: system sans (`Arial`, `Helvetica`, `sans-serif`).
@@ -166,7 +181,7 @@ In a fast-moving trade terminal, you are the shift coordinator during sudden tar
   - Danger/penalty: red accents.
 - Always show:
   - Timer (top-left), Score (top-center), Strikes (top-right), Event banner (top bar).
-- Containers must show urgency bar with green→yellow→red transition.
+- Containers must show urgency bar with greenâ†’yellowâ†’red transition.
 - Drag-hover lane border thickens and glows.
 
 ## Juice Ideas (Optional to Implement)
@@ -184,9 +199,9 @@ In a fast-moving trade terminal, you are the shift coordinator during sudden tar
 - **Why DOM:** Faster one-day implementation for drag/drop readability, easy lane highlighting, easy text-heavy UI updates, no canvas hit-testing complexity.
 
 ## File Structure
-- `index.html` — HUD, board layout, end modal, script/style links.
-- `style.css` — layout, color system, lane/container styling, feedback animations.
-- `game.js` — state, spawn logic, event logic, drag/drop handlers, update loop, render updates.
+- `index.html` â€” HUD, board layout, end modal, script/style links.
+- `style.css` â€” layout, color system, lane/container styling, feedback animations.
+- `game.js` â€” state, spawn logic, event logic, drag/drop handlers, update loop, render updates.
 
 ## State Model (Single Object)
 ```js
@@ -403,7 +418,7 @@ Implement **Milestone 0 only** with no extra features.
 
 ## Tariff event system (simple, readable)
 - Only one active event at a time.
-- Event appears every 18–24s, lasts 10–14s.
+- Event appears every 18â€“24s, lasts 10â€“14s.
 - Implement these events:
   1. Import Surcharge: any drop in Import gets extra -10.
   2. Food Exemption: Food dropped in Import counts as correct (+15).
@@ -412,12 +427,12 @@ Implement **Milestone 0 only** with no extra features.
 - Always show active event name, short description, and countdown.
 
 ## Difficulty ramp across 90s
-- 0–15s spawn every 2.4s (Food + Electronics only)
-- 15–30s spawn every 2.0s (add Machinery)
-- 30–45s spawn every 1.8s
-- 45–60s spawn every 1.6s
-- 60–75s spawn every 1.4s
-- 75–90s spawn every 1.25s
+- 0â€“15s spawn every 2.4s (Food + Electronics only)
+- 15â€“30s spawn every 2.0s (add Machinery)
+- 30â€“45s spawn every 1.8s
+- 45â€“60s spawn every 1.6s
+- 60â€“75s spawn every 1.4s
+- 75â€“90s spawn every 1.25s
 
 ## UI/UX constraints
 - High-contrast readable UI, no external assets.
@@ -466,3 +481,4 @@ Important constraints:
 8. Wait for tariff event; verify banner text + countdown + rule effect applies.
 9. Continue until 3 strikes; verify immediate end modal and restart works.
 10. Play to timer end (without 3 strikes); verify run-complete end modal and final score shown.
+

@@ -1,4 +1,4 @@
-// Tariff Panic - Milestone 1 implementation using a single central game state.
+// Tariff Panic - Milestone 2 implementation using a single central game state.
 (() => {
   const GAME_LENGTH = 90;
   const MAX_STRIKES = 3;
@@ -70,6 +70,7 @@
     strikes: document.getElementById("strikes"),
     combo: document.getElementById("combo"),
     bestScore: document.getElementById("best-score"),
+    statusText: document.getElementById("status-text"),
     queue: document.getElementById("queue"),
     eventBanner: document.getElementById("event-banner"),
     eventName: document.querySelector(".event-name"),
@@ -81,7 +82,9 @@
     endModal: document.getElementById("end-modal"),
     endTitle: document.getElementById("end-title"),
     endMessage: document.getElementById("end-message"),
+    endStats: document.getElementById("end-stats"),
     restartBtn: document.getElementById("restart-btn"),
+    pauseBtn: document.getElementById("pause-btn"),
     difficultySelect: document.getElementById("difficulty-select"),
     tutorialOverlay: document.getElementById("tutorial-overlay"),
     startBtn: document.getElementById("start-btn")
@@ -106,13 +109,28 @@
     bestScore: Number(localStorage.getItem(BEST_SCORE_KEY)) || 0,
     difficulty: "normal",
     audioCtx: null,
-    tutorialTimer: null
+    tutorialTimer: null,
+    paused: false,
+    selectedContainerId: null,
+    stats: emptyStats()
   };
+
+  function emptyStats() {
+    return {
+      routedCorrect: 0,
+      routedHold: 0,
+      routedWrong: 0,
+      expired: 0,
+      overflow: 0,
+      eventsTriggered: 0
+    };
+  }
 
   function init() {
     bindLaneDnD();
     bindKeyboardShortcuts();
     dom.restartBtn.addEventListener("click", restart);
+    dom.pauseBtn.addEventListener("click", () => togglePause());
     dom.startBtn.addEventListener("click", beginShift);
     dom.difficultySelect.addEventListener("change", () => {
       state.difficulty = dom.difficultySelect.value;
@@ -148,6 +166,7 @@
   function startGame() {
     resetState();
     state.running = true;
+    state.paused = false;
     state.lastTimestamp = performance.now();
     render();
     requestAnimationFrame(update);
@@ -167,6 +186,12 @@
     state.eventTimeLeft = 0;
     state.nextEventIn = scaledRange(18, 24);
     state.draggedContainerId = null;
+    state.selectedContainerId = null;
+    state.stats = emptyStats();
+    state.paused = false;
+    dom.pauseBtn.textContent = "Pause";
+    dom.pauseBtn.setAttribute("aria-pressed", "false");
+    dom.pauseBtn.disabled = false;
     dom.endModal.classList.add("hidden");
     dom.feedbackLayer.innerHTML = "";
   }
@@ -176,6 +201,13 @@
 
     const dt = Math.min(0.1, (timestamp - state.lastTimestamp) / 1000);
     state.lastTimestamp = timestamp;
+
+    if (state.paused) {
+      render();
+      requestAnimationFrame(update);
+      return;
+    }
+
     state.timeLeft = Math.max(0, state.timeLeft - dt);
 
     updateDifficulty();
@@ -190,6 +222,16 @@
 
     render();
     requestAnimationFrame(update);
+  }
+
+  function togglePause(forcePaused) {
+    if (!state.running) return;
+    const nextPaused = typeof forcePaused === "boolean" ? forcePaused : !state.paused;
+    state.paused = nextPaused;
+    dom.pauseBtn.textContent = state.paused ? "Resume" : "Pause";
+    dom.pauseBtn.setAttribute("aria-pressed", state.paused ? "true" : "false");
+    dom.app.classList.toggle("paused", state.paused);
+    render();
   }
 
   function updateDifficulty() {
@@ -228,7 +270,11 @@
     });
 
     if (state.containers.length > DIFFICULTY[state.difficulty].overflowLimit) {
-      state.containers.shift();
+      const removed = state.containers.shift();
+      if (removed && state.selectedContainerId === removed.id) {
+        state.selectedContainerId = null;
+      }
+      state.stats.overflow += 1;
       applyPenalty(-12, 1, "Overflow! -12, +1 strike");
     }
   }
@@ -249,6 +295,7 @@
       state.activeEvent = state.nextEventPreview;
       state.eventTimeLeft = randomRange(10, 14);
       state.nextEventPreview = randomEvent();
+      state.stats.eventsTriggered += 1;
       pushFeedback(`Event: ${state.activeEvent.name}`, "good");
       playTone(720, 0.08);
     }
@@ -264,13 +311,17 @@
       container.urgencyLeft -= dt * drainMultiplier;
       if (container.urgencyLeft <= 0) {
         state.containers.splice(i, 1);
+        if (state.selectedContainerId === container.id) {
+          state.selectedContainerId = null;
+        }
+        state.stats.expired += 1;
         applyPenalty(-8, 1, `${container.type} expired! -8, +1 strike`);
       }
     }
   }
 
   function resolveDrop(containerId, lane) {
-    if (!state.running) return;
+    if (!state.running || state.paused) return;
 
     const index = state.containers.findIndex((item) => item.id === containerId);
     if (index === -1) return;
@@ -281,6 +332,7 @@
     let points = 0;
     let strikeGain = 0;
     let countsAsCorrect = false;
+    let attemptedWrong = false;
 
     if (lane === "Hold") {
       points += 5;
@@ -293,6 +345,7 @@
     } else {
       points -= 10;
       strikeGain += 1;
+      attemptedWrong = true;
       state.combo = 0;
       pushFeedback("Wrong lane -10, +1 strike", "bad");
     }
@@ -333,7 +386,17 @@
 
     state.score += points;
     state.strikes += strikeGain;
+    if (lane === "Hold") {
+      state.stats.routedHold += 1;
+    } else if (countsAsCorrect) {
+      state.stats.routedCorrect += 1;
+    } else if (attemptedWrong) {
+      state.stats.routedWrong += 1;
+    }
     state.containers.splice(index, 1);
+    if (state.selectedContainerId === containerId) {
+      state.selectedContainerId = null;
+    }
 
     if (state.strikes >= MAX_STRIKES) {
       endGame();
@@ -354,6 +417,11 @@
 
   function endGame() {
     state.running = false;
+    state.paused = false;
+    dom.app.classList.remove("paused");
+    dom.pauseBtn.textContent = "Pause";
+    dom.pauseBtn.setAttribute("aria-pressed", "false");
+    dom.pauseBtn.disabled = true;
     updateBestScore();
     render();
 
@@ -364,6 +432,10 @@
       dom.endTitle.textContent = "Shift Complete";
       dom.endMessage.textContent = `Time elapsed. Final Score: ${Math.round(state.score)}`;
     }
+    dom.endStats.textContent =
+      `Correct: ${state.stats.routedCorrect} | Hold: ${state.stats.routedHold} | ` +
+      `Wrong: ${state.stats.routedWrong} | Expired: ${state.stats.expired} | ` +
+      `Overflow: ${state.stats.overflow} | Events: ${state.stats.eventsTriggered}`;
 
     dom.endModal.classList.remove("hidden");
   }
@@ -383,11 +455,19 @@
 
   function bindKeyboardShortcuts() {
     window.addEventListener("keydown", (event) => {
-      if (!state.running) {
-        if (event.key.toLowerCase() === "r") restart();
+      const key = event.key.toLowerCase();
+      if (key === "p" || event.key === " ") {
+        event.preventDefault();
+        togglePause();
         return;
       }
 
+      if (!state.running) {
+        if (key === "r") restart();
+        return;
+      }
+
+      if (state.paused) return;
       if (state.containers.length === 0) return;
       const oldest = state.containers[0];
       if (event.key === "1") resolveDrop(oldest.id, "Domestic");
@@ -399,6 +479,7 @@
   function bindLaneDnD() {
     dom.lanes.forEach((laneEl) => {
       laneEl.addEventListener("dragover", (event) => {
+        if (!state.running || state.paused) return;
         event.preventDefault();
         laneEl.classList.add("hover");
       });
@@ -408,6 +489,7 @@
       });
 
       laneEl.addEventListener("drop", (event) => {
+        if (!state.running || state.paused) return;
         event.preventDefault();
         laneEl.classList.remove("hover");
         const idFromData = Number(event.dataTransfer.getData("text/plain"));
@@ -415,6 +497,11 @@
         if (id) {
           resolveDrop(id, laneEl.dataset.lane);
         }
+      });
+
+      laneEl.addEventListener("click", () => {
+        if (!state.running || state.paused || !state.selectedContainerId) return;
+        resolveDrop(state.selectedContainerId, laneEl.dataset.lane);
       });
     });
   }
@@ -444,6 +531,7 @@
     dom.strikes.textContent = `${state.strikes}/${MAX_STRIKES}`;
     dom.combo.textContent = `x${Math.max(1, state.combo)}`;
     dom.bestScore.textContent = state.bestScore;
+    dom.statusText.textContent = state.running ? (state.paused ? "Paused" : "Live") : "Stopped";
 
     renderEventBanner();
     renderTicker();
@@ -480,11 +568,19 @@
     for (const container of state.containers) {
       const card = document.createElement("article");
       card.className = `container-card type-${container.type.toLowerCase()}`;
+      card.classList.toggle("selected", container.id === state.selectedContainerId);
       card.draggable = true;
 
       card.addEventListener("dragstart", (event) => {
         state.draggedContainerId = container.id;
+        state.selectedContainerId = container.id;
         event.dataTransfer.setData("text/plain", String(container.id));
+      });
+
+      card.addEventListener("click", () => {
+        if (!state.running || state.paused) return;
+        state.selectedContainerId = state.selectedContainerId === container.id ? null : container.id;
+        renderQueue();
       });
 
       card.innerHTML = `

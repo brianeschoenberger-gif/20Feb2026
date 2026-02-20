@@ -44,6 +44,7 @@ h1 {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .controls select {
@@ -52,6 +53,11 @@ h1 {
   background: #111a30;
   color: var(--text);
   padding: 0.35rem;
+}
+
+#pause-btn {
+  background: #1e3d8f;
+  padding: 0.4rem 0.75rem;
 }
 
 .event-banner {
@@ -94,7 +100,7 @@ h1 {
 .hud {
   margin-top: 0.75rem;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 0.75rem;
 }
 
@@ -163,6 +169,11 @@ h1 {
   cursor: grabbing;
 }
 
+.container-card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px #8bdcff33;
+}
+
 .container-title {
   display: flex;
   justify-content: space-between;
@@ -218,6 +229,11 @@ h1 {
   border-color: var(--accent);
   background: #1b2b4b;
   transform: translateY(-3px);
+}
+
+.lane:focus-visible {
+  outline: 2px solid #8bdcff;
+  outline-offset: 2px;
 }
 
 .feedback-layer {
@@ -287,6 +303,11 @@ button {
 button:hover,
 button:focus-visible {
   filter: brightness(1.08);
+}
+
+.app.paused .lane,
+.app.paused .container-card {
+  opacity: 0.82;
 }
 
 .shake {

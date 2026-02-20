@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tariff Panic — Milestone 1</title>
+    <title>Tariff Panic - Milestone 2</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -17,6 +17,7 @@
             <option value="normal" selected>Normal</option>
             <option value="hard">Hard</option>
           </select>
+          <button id="pause-btn" type="button" aria-pressed="false">Pause</button>
         </section>
         <section id="event-banner" class="event-banner inactive" aria-live="polite">
           <div class="event-name">No Active Event</div>
@@ -32,6 +33,7 @@
         <div class="hud-item"><span>Combo</span><strong id="combo">x1</strong></div>
         <div class="hud-item"><span>Best</span><strong id="best-score">0</strong></div>
         <div class="hud-item"><span>Strikes</span><strong id="strikes">0/3</strong></div>
+        <div class="hud-item"><span>Status</span><strong id="status-text">Live</strong></div>
       </section>
 
       <section class="board">
@@ -77,6 +79,7 @@
       <div class="end-content">
         <h2 id="end-title">Shift Complete</h2>
         <p id="end-message">Final Score: 0</p>
+        <p id="end-stats">Correct: 0 | Hold: 0 | Wrong: 0 | Expired: 0 | Overflow: 0</p>
         <button id="restart-btn" type="button">Restart Run</button>
       </div>
     </section>
@@ -84,3 +87,5 @@
     <script src="game.js"></script>
   </body>
 </html>
+
+
